@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChippayDiscounts.Discounts", "ChippayDiscounts.Discounts\ChippayDiscounts.Discounts.csproj", "{EE4EABC5-B2AC-44AC-B2BC-8C3A5329E1CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChippayDiscounts.Core", "ChippayDiscounts.Core\ChippayDiscounts.Core.csproj", "{D62FD0CF-DB1F-4E00-87BC-CDFB4BFC659D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChippayDiscounts.Tests", "ChippayDiscounts.Tests\ChippayDiscounts.Tests.csproj", "{5A54EB5C-1D32-4B9B-A72C-E6E79DEB82EA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EE4EABC5-B2AC-44AC-B2BC-8C3A5329E1CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EE4EABC5-B2AC-44AC-B2BC-8C3A5329E1CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EE4EABC5-B2AC-44AC-B2BC-8C3A5329E1CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EE4EABC5-B2AC-44AC-B2BC-8C3A5329E1CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D62FD0CF-DB1F-4E00-87BC-CDFB4BFC659D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D62FD0CF-DB1F-4E00-87BC-CDFB4BFC659D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D62FD0CF-DB1F-4E00-87BC-CDFB4BFC659D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D62FD0CF-DB1F-4E00-87BC-CDFB4BFC659D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A54EB5C-1D32-4B9B-A72C-E6E79DEB82EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A54EB5C-1D32-4B9B-A72C-E6E79DEB82EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A54EB5C-1D32-4B9B-A72C-E6E79DEB82EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A54EB5C-1D32-4B9B-A72C-E6E79DEB82EA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
