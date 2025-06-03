@@ -25,4 +25,10 @@
       <ProjectReference Include="..\ChippayDiscounts.Discounts\ChippayDiscounts.Discounts.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Reference Include="ChippayDiscounts.Core">
+            <HintPath>..\ChippayDiscounts.Core\bin\Debug\net8.0\ChippayDiscounts.Core.dll</HintPath>
+        </Reference>
+    </ItemGroup>
+    
 </Project>
