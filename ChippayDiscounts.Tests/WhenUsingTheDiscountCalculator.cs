@@ -4,84 +4,8 @@ using ChippayDiscounts.Core;
 
 namespace ChippayDiscounts.Tests;
 
-public class DiscountTests : DiscountTestsBase
+public class WhenUsingTheDiscountCalculator : DiscountTestsBase
 {
-    [TestCaseSource(nameof(StrategyCases))]
-    public void ThenStrategiesGiveNonNegativeDiscounts(IDiscountStrategy strategy)
-    {
-        var items = new[]
-        {
-            new BasketItem("banana", 100m),
-            new BasketItem("steak", 400m)
-        };
-
-        var calc = new DiscountCalculator(strategy);
-        var total = calc.ApplyDiscount(items);
-
-        Assert.That(total, Is.GreaterThanOrEqualTo(0m));
-        Assert.That(total, Is.LessThanOrEqualTo(items.Sum(i => i.Price)));
-    }
-
-    [TestCaseSource(nameof(StrategyCases))]
-    public void ThenEmptyBasketsReturnsZeroDiscounts(IDiscountStrategy strategy)
-    {
-        var calc = new DiscountCalculator(strategy);
-        var items = Array.Empty<BasketItem>();
-
-        var total = calc.ApplyDiscount(items);
-
-        Assert.That(total, Is.EqualTo(0m));
-    }
-
-    [TestCaseSource(nameof(StrategyCases))]
-    public void ThenZeroPriceItemsDoNotAffectDiscounts(IDiscountStrategy strategy)
-    {
-        var withFreebie = new[]
-        {
-            new BasketItem("freebie", 0m),
-            new BasketItem("paid", 200m)
-        };
-        
-        var withoutFreebie = new[]
-        {
-            new BasketItem("paid", 200m)
-        };
-
-        var calc = new DiscountCalculator(strategy);
-        var withFreebieTotal = calc.ApplyDiscount(withFreebie);
-        var withoutFreebieTotal = calc.ApplyDiscount(withoutFreebie);
-
-        Assert.That(withFreebieTotal, Is.EqualTo(withoutFreebieTotal)); // 5% of 200, adjust if needed per strategy
-    }
-
-    [TestCaseSource(nameof(StrategyCases))]
-    public void ThenNegativePricesAreHandledSafely(IDiscountStrategy strategy)
-    {
-        var items = new[] { new BasketItem("curse", -100m) };
-
-        var calc = new DiscountCalculator(strategy);
-
-        Assert.Throws<Exception>(() => calc.ApplyDiscount(items));
-    }
-    
-    [TestCaseSource(nameof(StrategyCases))]
-    public void ThenDiscountsAreConsistent(IDiscountStrategy strategy)
-    {
-        var items = new[] {
-            new BasketItem("banana", 100m),
-            new BasketItem("steak", 400m)
-        };
-
-        var calc = new DiscountCalculator(strategy);
-        var first = calc.ApplyDiscount(items);
-        for (int i = 0; i < 5; i++)
-        {
-            var next = calc.ApplyDiscount(items);
-            Assert.That(next, Is.EqualTo(first), 
-                $"Inconsistent discount from {strategy.GetType().Name} on iteration {i}");
-        }
-    }
-
     [Test]
     public void ThenRegularDiscountAppliesFixedPercentage()
     {
@@ -103,13 +27,21 @@ public class DiscountTests : DiscountTestsBase
     public void ThenVipDiscountAppliesFixedPercentage()
     {
         // basket of items worth 200
-        // expect 20% discount = 160
+        // expect 20% discount to be applied to the total
     }
-    
+
     [Test, Ignore("support product-specific discounts")]
     public void ThenFruitOnlyDiscountAppliesOnlyToFruits()
     {
-        // fruit + non-fruit → only fruit discounted
+        // basket with fruit + non-fruit → only fruit discounted
+    }
+
+    [Test, Ignore("implement tiered discount logic")]
+    public void ThenTieredDiscountGivesHigherDiscountsForLargerTotals()
+    {
+        // total under 100 → 0%
+        // total 100–499 → 5%
+        // total 500+ → 10%
     }
 
     [Test, Ignore("combine multiple discounts")]
@@ -117,14 +49,107 @@ public class DiscountTests : DiscountTestsBase
     {
         // combine two strategies
         // e.g. tiered + fruit
-    }
 
-    [Test, Ignore("implement tiered discount logic")]
-    public void ThenTieredDiscountGivesHigherDiscountsForLargerTotals()
+        // *nudge nudge* composition *wink wink*
+    }
+    
+    /*
+     * pls don't edit the tests below this line i'll cry :(
+     */
+
+    [Test]
+    public void ThenStrategiesGiveNonNegativeDiscounts()
     {
-        // under 100 → 0%
-        // 100–499 → 5%
-        // 500+ → 10%
+        foreach (var strategy in GetDiscountStrategies())
+        {
+            var items = new[]
+            {
+                new BasketItem("banana", 100m),
+                new BasketItem("steak", 400m)
+            };
+
+            var calc = new DiscountCalculator(strategy);
+            var total = calc.ApplyDiscount(items);
+
+            Assert.That(total, Is.GreaterThanOrEqualTo(0m), 
+                $"Strategy {strategy.GetType().Name} returned a negative total after discount");
+            Assert.That(total, Is.LessThanOrEqualTo(items.Sum(i => i.Price)),
+                $"Strategy {strategy.GetType().Name} returned a total higher than the original basket total");
+        }
     }
 
+    [Test]
+    public void ThenEmptyBasketsReturnsZeroDiscounts()
+    {
+        foreach (var strategy in GetDiscountStrategies())
+        {
+            var calc = new DiscountCalculator(strategy);
+            var items = Array.Empty<BasketItem>();
+
+            var total = calc.ApplyDiscount(items);
+
+            Assert.That(total, Is.EqualTo(0m),
+                $"Strategy {strategy.GetType().Name} returned a non-zero total for empty basket");
+        }
+    }
+
+    [Test]
+    public void ThenZeroPriceItemsDoNotAffectDiscounts()
+    {
+        foreach (var strategy in GetDiscountStrategies())
+        {
+            var withFreebie = new[]
+            {
+                new BasketItem("freebie", 0m),
+                new BasketItem("paid", 200m)
+            };
+            
+            var withoutFreebie = new[]
+            {
+                new BasketItem("paid", 200m)
+            };
+
+            var calc = new DiscountCalculator(strategy);
+            var withFreebieTotal = calc.ApplyDiscount(withFreebie);
+            var withoutFreebieTotal = calc.ApplyDiscount(withoutFreebie);
+
+            Assert.That(withFreebieTotal, Is.EqualTo(withoutFreebieTotal),
+                $"Strategy {strategy.GetType().Name} handled zero-price items inconsistently");
+        }
+    }
+
+    [Test]
+    public void ThenNegativePricesAreHandledSafely()
+    {
+        foreach (var strategy in GetDiscountStrategies())
+        {
+            var items = new[] { new BasketItem("curse", -100m) };
+            var calc = new DiscountCalculator(strategy);
+
+            Assert.Throws<Exception>(() => calc.ApplyDiscount(items),
+                $"Strategy {strategy.GetType().Name} did not throw exception for negative price");
+        }
+    }
+    
+    [Test]
+    public void ThenDiscountsAreConsistent()
+    {
+        foreach (var strategy in GetDiscountStrategies())
+        {
+            var items = new[] {
+                new BasketItem("banana", 100m),
+                new BasketItem("steak", 400m)
+            };
+
+            var calc = new DiscountCalculator(strategy);
+            var first = calc.ApplyDiscount(items);
+            for (int i = 0; i < 5; i++)
+            {
+                var next = calc.ApplyDiscount(items);
+                Assert.That(next, Is.EqualTo(first), 
+                    $"Inconsistent discount from {strategy.GetType().Name} on iteration {i}");
+            }
+        }
+    }
+    
 }

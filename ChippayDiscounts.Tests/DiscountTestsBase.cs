@@ -5,27 +5,14 @@ namespace ChippayDiscounts.Tests;
 
 public class DiscountTestsBase
 {
-    protected static IEnumerable<TestCaseData> StrategyCases()
+    protected static IEnumerable<IDiscountStrategy> GetDiscountStrategies()
     {
-        var strats = LoadFromNamespace("ChippayDiscounts.Discounts.Discounts");
-        foreach (var strat in strats)
-        {
-            yield return new TestCaseData(strat)
-                .SetName($"{strat.GetType().Name}");
-        }
-    }
-
-    private static IEnumerable<IDiscountStrategy> LoadFromNamespace(string ns)
-    {
-        var strategyType = typeof(IDiscountStrategy);
-        Assembly.Load("ChippayDiscounts.Discounts");
-        
         return AppDomain.CurrentDomain
             .GetAssemblies()
             .SelectMany(SafeGetTypes)
-            .Where<Type>(t => typeof(IDiscountStrategy).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract)
+            .Where<Type>(t => typeof(IDiscountStrategy).IsAssignableFrom(t) && t is { IsInterface: false, IsAbstract: false })
             .Select(TryCreate)!
-            .Where<object>(x => x != null)!
+            .Where<object>(x => x != null!)!
             .Cast<IDiscountStrategy>();
     }
 
@@ -47,4 +34,5 @@ public class DiscountTestsBase
         var constructor = type.GetConstructor(Type.EmptyTypes);
         return constructor != null ? constructor.Invoke(null) : null;
     }
+
 }
